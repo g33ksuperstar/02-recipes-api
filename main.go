@@ -12,10 +12,10 @@ import (
 	"github.com/rs/xid"
 )
 
-var recipes []Recipe
+var recipeList []Recipe
 
 func init() {
-	recipes = make([]Recipe, 0)
+	recipeList = make([]Recipe, 0)
 	file, err := os.OpenFile("recipes.json", os.O_RDONLY, 0755)
 	if err != nil {
 		log.Fatal("Error opening file:", err)
@@ -24,7 +24,7 @@ func init() {
 	if err != nil {
 		log.Fatal("Error reading file:", err)
 	}
-	_ = json.Unmarshal([]byte(fileBytes), &recipes)
+	_ = json.Unmarshal([]byte(fileBytes), &recipeList)
 }
 
 type Recipe struct {
@@ -46,17 +46,43 @@ func NewRecipeHandler(c *gin.Context) {
 
 	recipe.ID = xid.New().String()
 	recipe.PublishedAt = time.Now()
-	recipes = append(recipes, recipe)
+	recipeList = append(recipeList, recipe)
 	c.JSON(http.StatusOK, recipe)
 }
 
 func ListRecipesHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, recipes)
+	c.JSON(http.StatusOK, recipeList)
+}
+
+func UpdateRecipeHandler(c *gin.Context) {
+	id := c.Param("id")
+	var recipe Recipe
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+	}
+
+	index := -1
+	for i := 0; i < len(recipeList); i++ {
+		if recipeList[i].ID == id {
+			index = i
+		}
+	}
+
+	if index == -1 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Recipe not found"})
+		return
+	}
+
+	recipeList[index] = recipe
+	c.JSON(http.StatusOK, recipe)
 }
 
 func main() {
 	router := gin.Default()
 	router.POST("/recipes", NewRecipeHandler)
 	router.GET("/recipes", ListRecipesHandler)
+	router.PUT("/recipes/:id", UpdateRecipeHandler)
 	router.Run()
 }
