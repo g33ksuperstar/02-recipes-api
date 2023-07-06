@@ -1,0 +1,71 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "host": "localhost:8080",
+  "basePath": "/",
+  "paths": {
+    "/recipes": {
+      "get": {
+        "description": "It returns a list of nested objects which contains all recipes",
+        "produces": [
+          "application/json"
+        ],
+        "summary": "List all recipes",
+        "responses": {
+          "200": {
+            "description": "Succesful Operation"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Categories Not Found"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/recipes/{id}": {
+      "get": {
+        "description": "It updates the recipe specified by the id parameter",
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Update recipe",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "ID of the recipe",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succesful Operation"
+          },
+          "400": {
+            "description": "Invalid Input"
+          },
+          "404": {
+            "description": "Invalid Recipe"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    }
+  }
+}
